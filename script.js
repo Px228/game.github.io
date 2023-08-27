@@ -92,6 +92,8 @@ function startGame() {
 
   // Обновляем положение камеры
   updateCameraPosition();
+  // Call the function to enable joystick control
+  enableJoystickControl();
 }
 let isMovingUp = false;
 let isMovingDown = false;
@@ -339,6 +341,31 @@ function openSettings() {
     radio.addEventListener("change", handleControlChange);
   });
 }
+
+// ...
+
+// const settingsButton = document.getElementById("settingsButton");
+const settingsModal = document.getElementById("settingsModal");
+const closeSettingsButton = document.getElementById("closeSettings");
+
+settingsButton.addEventListener("click", openSettings);
+closeSettingsButton.addEventListener("click", closeSettingsModal);
+
+function openSettings() {
+  // Close the pause modal if it's open
+  pauseModal.style.display = "none";
+  
+  settingsModal.style.display = "block";
+  // ... (rest of the code)
+}
+
+function closeSettingsModal() {
+  settingsModal.style.display = "none";
+}
+
+// ...
+
+
 function handleControlChange(event) {
   const selectedControlType = event.target.value;
 
