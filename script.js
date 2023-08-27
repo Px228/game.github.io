@@ -1,271 +1,466 @@
-// const character = document.getElementById("character");
-
-// // Начальное положение персонажа
-// let posX = 0;
-// let posY = 0;
-
-// // Направление движения по умолчанию
-// let direction = "right";
-
-// // Функция для изменения направления
-// function changeDirection(newDirection) {
-//   character.classList.remove(direction);
-//   direction = newDirection;
-//   character.classList.add(direction);
-// }
-
-// // Функция для перемещения персонажа
-// function moveCharacter() {
-//   switch (direction) {
-//     case "left":
-//       posX -= 10;
-//       break;
-//     case "right":
-//       posX += 10;
-//       break;
-//     case "up":
-//       posY -= 10;
-//       break;
-//     case "down":
-//       posY += 10;
-//       break;
-//   }
-
-//   // Применение изменений положения персонажа
-//   character.style.left = posX + "px";
-//   character.style.top = posY + "px";
-// }
-
-// // Запуск перемещения через интервал
-// setInterval(moveCharacter, 100); // Перемещение каждые 100 миллисекунд
-
-// document.addEventListener("keydown", (event) => {
-//   switch (event.key) {
-//     case "ArrowLeft":
-//       changeDirection("left");
-//       break;
-//     case "ArrowRight":
-//       changeDirection("right");
-//       break;
-//     case "ArrowUp":
-//       changeDirection("up");
-//       break;
-//     case "ArrowDown":
-//       changeDirection("down");
-//       break;
-//   }
-// });
-
-
-
-
-// const character = document.getElementById("character");
-// const camera = document.getElementById("camera");
-
-// // Начальное положение персонажа
-// let posX = 0;
-// let posY = 0;
-
-// // Начальное положение камеры
-// let cameraX = 0;
-// let cameraY = 0;
-
-// // Размер окна камеры
-// const cameraWidth = camera.clientWidth;
-// const cameraHeight = camera.clientHeight;
-
-// // Направление движения по умолчанию
-// let direction = "right";
-
-// // Функция для изменения направления
-// function changeDirection(newDirection) {
-//   character.classList.remove(direction);
-//   direction = newDirection;
-//   character.classList.add(direction);
-// }
-
-// // Функция для перемещения персонажа
-// function moveCharacter() {
-//   switch (direction) {
-//     case "left":
-//       posX -= 10;
-//       break;
-//     case "right":
-//       posX += 10;
-//       break;
-//     case "up":
-//       posY -= 10;
-//       break;
-//     case "down":
-//       posY += 10;
-//       break;
-//   }
-
-//   // Позиция камеры следует за персонажем с отступом
-//   cameraX = posX - cameraWidth / 2 + character.clientWidth / 2;
-//   cameraY = posY - cameraHeight / 2 + character.clientHeight / 2;
-
-//   // Применение изменений положения персонажа и камеры
-//   character.style.left = posX + "px";
-//   character.style.top = posY + "px";
-//   camera.style.left = cameraX + "px";
-//   camera.style.top = cameraY + "px";
-// }
-
-// // Запуск перемещения через интервал
-// setInterval(moveCharacter, 100); // Перемещение каждые 100 миллисекунд
-
-// document.addEventListener("keydown", (event) => {
-//   switch (event.key) {
-//     case "ArrowLeft":
-//       changeDirection("left");
-//       break;
-//     case "ArrowRight":
-//       changeDirection("right");
-//       break;
-//     case "ArrowUp":
-//       changeDirection("up");
-//       break;
-//     case "ArrowDown":
-//       changeDirection("down");
-//       break;
-//   }
-// });
-
-
+const startButton = document.getElementById("startButton");
+const gameContainer = document.getElementById("gameContainer");
 const character = document.getElementById("character");
-const camera = document.getElementById("camera");
+let characterX = 0;
+let characterY = 0;
+let score = 0; // Изначально счет равен 0
+const scoreElement = document.getElementById("score");
+let balls = [];
+const miniMap = document.getElementById("miniMap");
+const miniCharacter = document.createElement("div");
+miniCharacter.className = "mini-character";
+miniMap.appendChild(miniCharacter);
 
-// Размеры карты
-const mapWidth = 1000;
-const mapHeight = 1000;
+// При загрузке страницы, загружаем сохраненные данные и обновляем отображение
+window.addEventListener("load", () => {
+  loadData();
+  updateScoreDisplay(); // Обновите отображение счетчика
+  updateSpeedLevelDisplay();
+  updateCameraPosition();
+});
 
-// Получение случайного числа в заданном диапазоне
-function getRandomInRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
+function updateMiniMap() {
+  const miniMapWidth = miniMap.offsetWidth;
+  const miniMapHeight = miniMap.offsetHeight;
 
-// Начальное положение персонажа (рандомные координаты)
-let posX = getRandomInRange(0, mapWidth - character.clientWidth);
-let posY = getRandomInRange(0, mapHeight - character.clientHeight);
+  const characterXOnMiniMap = (characterX / containerWidth) * miniMapWidth;
+  const characterYOnMiniMap = (characterY / containerHeight) * miniMapHeight;
 
-// Направление движения по умолчанию
-let direction = "up";
-
-// Функция для изменения направления
-function changeDirection(newDirection) {
-  character.classList.remove(direction);
-  direction = newDirection;
-  character.classList.add(direction);
+  miniCharacter.style.left = characterXOnMiniMap + "px";
+  miniCharacter.style.top = characterYOnMiniMap + "px";
 }
 
-// Функция для перемещения персонажа
-function moveCharacter() {
-  let newPosX = posX;
-  let newPosY = posY;
+const miniBallsContainer = document.getElementById("miniBalls");
 
-  switch (direction) {
-    case "left":
-      newPosX = Math.max(0, posX - 10);
-      break;
-    case "right":
-      newPosX = Math.min(mapWidth - character.clientWidth, posX + 10);
-      break;
-    case "up":
-      newPosY = Math.max(0, posY - 10);
-      break;
-    case "down":
-      newPosY = Math.min(mapHeight - character.clientHeight, posY + 10);
-      break;
-  }
+function updateMiniBalls() {
+  miniBallsContainer.innerHTML = ""; // Очищаем контейнер перед обновлением
 
-  // Проверка на столкновение с "стеной"
-  if (checkCollision(newPosX, newPosY)) {
-    gameOver();
-    return;
-  }
-
-  // Применение изменений положения персонажа
-  posX = newPosX;
-  posY = newPosY;
-
-  // Позиционирование камеры
-  const cameraPosX = posX - camera.clientWidth / 2 + character.clientWidth / 2;
-  const cameraPosY = posY - camera.clientHeight / 2 + character.clientHeight / 2;
-  camera.style.transform = `translate(${-cameraPosX}px, ${-cameraPosY}px)`;
-
-  // Запуск анимации движения персонажа
-  character.style.transform = `translate(${posX}px, ${posY}px)`;
-}
-
-// Функция для проверки столкновения
-function checkCollision(x, y) {
-  // Здесь вы можете добавить более сложную логику столкновения с "стенами"
-  // Например, если координаты (x, y) находятся в области стены
-  return x <= 0 || y <= 0 || x >= mapWidth - character.clientWidth || y >= mapHeight - character.clientHeight;
-}
-let gameInterval; // Переменная для хранения интервала игры
-
-// Функция для запуска игры
-function startGame() {
-  gameInterval = setInterval(moveCharacter, 100);
-}
-
-// Функция для окончания игры и показа окна
-function gameOver() {
-  clearInterval(gameInterval); // Остановить интервал игры
-  
-  // Получение ссылок на элементы окон и кнопки
-const gameOverModal = document.getElementById("gameOverModal");
-const backButton = document.getElementById("backButton");
-const mainMenuModal = document.getElementById("mainMenuModal");
-const playButton = document.getElementById("playButton");
-
-
-  
-  // Показать окно
-  gameOverModal.style.display = "flex";
-  
-  // Обработчик кнопки "Назад"
-  backButton.addEventListener("click", () => {
-    // Скрыть окно, перезапустить игру и запустить интервал заново
-    gameOverModal.style.display = "none";
-    posX = getRandomInRange(0, mapWidth - character.clientWidth);
-    posY = getRandomInRange(0, mapHeight - character.clientHeight);
-    startGame();
+  balls.forEach(ball => {
+    const miniBall = document.createElement("div");
+    miniBall.className = "mini-ball";
+    miniBall.style.left = (ball.offsetLeft / containerWidth) * 100 + "%";
+    miniBall.style.top = (ball.offsetTop / containerHeight) * 100 + "%";
+    miniBallsContainer.appendChild(miniBall);
   });
-  
-  // Генерация новых случайных координат персонажа
-  posX = getRandomInRange(0, mapWidth - character.clientWidth);
-  posY = getRandomInRange(0, mapHeight - character.clientHeight);
-  
-  // ...
-  
-  // Сброс позиционирования камеры
-  const cameraPosX = posX - camera.clientWidth / 2 + character.clientWidth / 2;
-  const cameraPosY = posY - camera.clientHeight / 2 + character.clientHeight / 2;
-  camera.style.transform = `translate(${-cameraPosX}px, ${-cameraPosY}px)`;
-  
-  // Сброс анимации движения персонажа
-  character.style.transform = `translate(${posX}px, ${posY}px)`;
 }
 
-// Запуск игры
-startGame();
+// ...
 
-document.addEventListener("keydown", (event) => {
+const maxSpeedLevel = 2; // Максимальный уровень скорости
+let speedLevel = 1; // Изначальный уровень скорости
+const speedUpgradeCost = 10; // Стоимость улучшения скорости
+
+const upgradeSpeedButton = document.getElementById("upgradeSpeedButton");
+const speedLevelElement = document.getElementById("speedLevel");
+
+upgradeSpeedButton.addEventListener("click", upgradeSpeed);
+
+function upgradeSpeed() {
+  if (speedLevel < maxSpeedLevel && score >= speedUpgradeCost) {
+    score -= speedUpgradeCost; // Уменьшаем количество кружков
+    speedLevel++; // Увеличиваем уровень скорости
+    speedLevelElement.textContent = speedLevel; // Обновляем текст уровня
+    collectedBallsCount.textContent = score; // Обновляем количество кружков
+  }
+}
+
+const camera = {
+  x: 0,
+  y: 0,
+  width: gameContainer.offsetWidth,
+  height: gameContainer.offsetHeight
+};
+
+const containerWidth = 5000; // Ширина игровой карты
+const containerHeight = 5000; // Высота игровой карты
+
+const characterWidth = character.offsetWidth;
+const characterHeight = character.offsetHeight;
+
+startButton.addEventListener("click", startGame);
+
+function startGame() {
+  startButton.classList.add("hidden");
+  gameContainer.classList.remove("hidden");
+  window.addEventListener("keydown", moveCharacter);
+
+  // Спавн игрока случайным образом
+  spawnCharacter();
+
+  // Спавн шариков
+  spawnBalls();
+
+  // Обновляем положение камеры
+  updateCameraPosition();
+}
+
+let isMovingUp = false;
+let isMovingDown = false;
+let isMovingLeft = false;
+let isMovingRight = false;
+// ...
+
+function moveCharacter() {
+  // Обработка движения с клавиатуры
+  handleKeyboardInput();
+
+  // Обработка движения с джойстика
+  const baseStep = 10;
+  const adjustedStep = baseStep * speedLevel; // Используйте актуальный уровень скорости
+
+  if (isMovingUp) {
+    characterY -= adjustedStep;
+  }
+  if (isMovingDown) {
+    characterY += adjustedStep;
+  }
+  if (isMovingLeft) {
+    characterX -= adjustedStep;
+  }
+  if (isMovingRight) {
+    characterX += adjustedStep;
+  }
+
+  // Проверяем границы карты
+  characterX = Math.max(0, Math.min(containerWidth - characterWidth, characterX));
+  characterY = Math.max(0, Math.min(containerHeight - characterHeight, characterY));
+
+  updateCharacterPosition();
+  updateCameraPosition();
+  checkCollision();
+}
+
+// ...
+
+function handleKeyboardInput() {
+  const baseStep = 10;
+  const adjustedStep = baseStep * speedLevel;
+
+  if (isMovingUp) {
+    characterY -= adjustedStep;
+  }
+  if (isMovingDown) {
+    characterY += adjustedStep;
+  }
+  if (isMovingLeft) {
+    characterX -= adjustedStep;
+  }
+  if (isMovingRight) {
+    characterX += adjustedStep;
+  }
+
+  // Проверяем границы карты
+  characterX = Math.max(0, Math.min(containerWidth - characterWidth, characterX));
+  characterY = Math.max(0, Math.min(containerHeight - characterHeight, characterY));
+}
+
+// ...
+
+// Подписываемся на события клавиатуры для управления игроком
+window.addEventListener("keydown", (event) => {
   switch (event.key) {
-    case "ArrowLeft":
-      changeDirection("left");
-      break;
-    case "ArrowRight":
-      changeDirection("right");
-      break;
     case "ArrowUp":
-      changeDirection("up");
+      isMovingUp = true;
       break;
     case "ArrowDown":
-      changeDirection("down");
+      isMovingDown = true;
+      break;
+    case "ArrowLeft":
+      isMovingLeft = true;
+      break;
+    case "ArrowRight":
+      isMovingRight = true;
       break;
   }
 });
+
+window.addEventListener("keyup", (event) => {
+  switch (event.key) {
+    case "ArrowUp":
+      isMovingUp = false;
+      break;
+    case "ArrowDown":
+      isMovingDown = false;
+      break;
+    case "ArrowLeft":
+      isMovingLeft = false;
+      break;
+    case "ArrowRight":
+      isMovingRight = false;
+      break;
+  }
+});
+
+// ...
+
+
+
+
+
+function spawnCharacter() {
+  characterX = Math.floor(Math.random() * (containerWidth - 50));
+  characterY = Math.floor(Math.random() * (containerHeight - 50));
+
+  updateCharacterPosition();
+}
+
+function updateCharacterPosition() {
+  character.style.left = characterX + "px";
+  character.style.top = characterY + "px";
+}
+
+function updateCameraPosition() {
+  // Центрируем камеру на игроке
+  camera.x = characterX - camera.width / 2 + character.offsetWidth / 2;
+  camera.y = characterY - camera.height / 2 + character.offsetHeight / 2;
+
+  if (camera.x < 0) {
+    camera.x = 0;
+  }
+  if (camera.y < 0) {
+    camera.y = 0;
+  }
+
+  gameContainer.style.transform = `translate(-${camera.x}px, -${camera.y}px)`;
+
+  updateMiniMap();
+}
+
+
+
+function spawnBalls() {
+  const numberOfBalls = 500;
+
+  for (let i = 0; i < numberOfBalls; i++) {
+    const ball = document.createElement("div");
+    ball.className = "ball";
+    gameContainer.appendChild(ball);
+
+    const ballX = Math.floor(Math.random() * (containerWidth - 30));
+    const ballY = Math.floor(Math.random() * (containerHeight - 30));
+
+    // Генерируем случайный цвет для шарика
+    const randomColor = getRandomColor();
+    ball.style.backgroundColor = randomColor;
+
+    ball.style.left = ballX + "px";
+    ball.style.top = ballY + "px";
+
+    balls.push(ball);
+  }
+}
+
+// Генерация случайного цвета в формате #RRGGBB
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function checkCollision() {
+  const playerRect = character.getBoundingClientRect();
+
+  balls.forEach((ball, index) => {
+    const ballRect = ball.getBoundingClientRect();
+
+    if (
+      playerRect.left < ballRect.right &&
+      playerRect.right > ballRect.left &&
+      playerRect.top < ballRect.bottom &&
+      playerRect.bottom > ballRect.top
+    ) {
+      gameContainer.removeChild(ball);
+      balls.splice(index, 1);
+      spawnBall(ball);
+      increaseScore(); // Увеличиваем счетчик при сборе кружка
+    }
+  });
+}
+function increaseScore() {
+  score++; // Увеличиваем счет
+  scoreElement.textContent = score; // Обновляем текст счетчика на экране
+  collectedBallsCount.textContent = score; // Обновляем текст счетчика в окне магазина
+}
+
+const shopButton = document.getElementById("shopButton");
+const shopModal = document.getElementById("shopModal");
+const closeModal = document.getElementById("closeModal");
+
+shopButton.addEventListener("click", openShopModal);
+closeModal.addEventListener("click", closeShopModal);
+
+// При открытии окна магазина, обновите счетчик внутри окна
+function openShopModal() {
+  shopModal.style.display = "block";
+  collectedBallsCount.textContent = score;
+
+  updateSpeedLevelDisplay(); // Проверяем и обновляем состояние и стили кнопки
+}
+
+const pauseButton = document.getElementById("pauseButton");
+const pauseModal = document.getElementById("pauseModal");
+const continueButton = document.getElementById("continueButton");
+const settingsButton = document.getElementById("settingsButton");
+
+pauseButton.addEventListener("click", openPauseModal);
+continueButton.addEventListener("click", closePauseModal);
+settingsButton.addEventListener("click", openSettings);
+
+function openPauseModal() {
+  pauseModal.style.display = "flex";
+}
+
+function closePauseModal() {
+  pauseModal.style.display = "none";
+}
+
+function openSettings() {
+  // Добавьте код для открытия окна настроек
+  // Например, изменение настроек игры, управление и т. д.
+  console.log("Открыть окно настроек");
+}
+
+
+function closeShopModal() {
+  shopModal.style.display = "none";
+}
+
+
+function spawnBall(ball) {
+  const ballX = Math.floor(Math.random() * (containerWidth - 30));
+  const ballY = Math.floor(Math.random() * (containerHeight - 30));
+
+  ball.style.left = ballX + "px";
+  ball.style.top = ballY + "px";
+
+  gameContainer.appendChild(ball);
+  balls.push(ball);
+}
+
+function updateSpeedLevelDisplay() {
+  speedLevelElement.textContent = speedLevel;
+
+  // Проверяем, достиг ли игрок максимального уровня скорости
+  if (speedLevel === maxSpeedLevel) {
+    upgradeSpeedButton.disabled = true; // Делаем кнопку неактивной
+    upgradeSpeedButton.style.display = "none"; // Скрываем кнопку
+  } else {
+    upgradeSpeedButton.disabled = false; // Включаем кнопку
+    upgradeSpeedButton.style.display = "block"; // Отображаем кнопку
+  }
+}
+
+
+const joystick = document.querySelector(".joystick");
+const stick = document.querySelector(".stick");
+
+let isMoving = false; // Flag to track joystick movement
+let stickX = 0;
+let stickY = 0;
+
+stick.addEventListener("mousedown", handleTouchStart);
+document.addEventListener("mousemove", handleTouchMove);
+document.addEventListener("mouseup", handleTouchEnd);
+
+// Event handler for touch start
+function handleTouchStart(event) {
+  event.preventDefault();
+  isMoving = true;
+}
+
+// Event handler for touch move
+function handleTouchMove(event) {
+  if (!isMoving) return;
+  event.preventDefault();
+
+  const joystickRect = joystick.getBoundingClientRect();
+  stickX = event.clientX - joystickRect.left - stick.offsetWidth / 2;
+  stickY = event.clientY - joystickRect.top - stick.offsetHeight / 2;
+  updateStickPosition();
+}
+
+// Event handler for touch end
+function handleTouchEnd(event) {
+  isMoving = false;
+  stickX = 0;
+  stickY = 0;
+  updateStickPosition();
+}
+
+// Function to update stick position and move the character
+function updateStickPosition() {
+  const maxDistance = joystick.offsetWidth / 2 - stick.offsetWidth / 2;
+  const distance = Math.min(Math.sqrt(stickX ** 2 + stickY ** 2), maxDistance);
+  const angle = Math.atan2(stickY, stickX);
+
+  const offsetX = distance * Math.cos(angle);
+  const offsetY = distance * Math.sin(angle);
+
+  stick.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+  moveCharacter(offsetX, offsetY); // Call the character movement function
+}
+
+// ...
+
+// Function for moving the character based on joystick input
+function moveCharacter(offsetX, offsetY) {
+  const step = 10;
+
+  if (offsetX > 0) {
+    characterX += step;
+  } else if (offsetX < 0) {
+    characterX -= step;
+  }
+
+  if (offsetY > 0) {
+    characterY += step;
+  } else if (offsetY < 0) {
+    characterY -= step;
+  }
+
+  // Check map boundaries
+  characterX = Math.max(0, Math.min(containerWidth - characterWidth, characterX));
+  characterY = Math.max(0, Math.min(containerHeight - characterHeight, characterY));
+
+  updateCharacterPosition();
+  updateCameraPosition();
+  checkCollision();
+}
+
+
+
+// При загрузке страницы, загружаем сохраненные данные и обновляем отображение
+window.addEventListener("load", () => {
+  loadData();
+  updateScoreDisplay(); // Обновите отображение счетчика
+  updateSpeedLevelDisplay();
+  updateCameraPosition();
+});
+
+// ...
+
+// Функция для сохранения данных в localStorage
+function saveData() {
+  localStorage.setItem("score", score);
+  localStorage.setItem("speedLevel", speedLevel);
+}
+
+// Функция для загрузки данных из localStorage
+function loadData() {
+  score = parseInt(localStorage.getItem("score")) || 0;
+  speedLevel = parseInt(localStorage.getItem("speedLevel")) || 1;
+  
+  updateScoreDisplay(); // Обновите отображение счетчика
+  updateSpeedLevelDisplay();
+}
+
+// При изменении данных, вызываем функцию сохранения
+window.addEventListener("beforeunload", saveData);
+
+// localStorage.clear();
+
+startButton.addEventListener("click", startGame);

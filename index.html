@@ -1,35 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Управляемый персонаж</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="styles.css">
+<title>Игра с шариками</title>
 </head>
 <body>
-  <div id="camera" class="camera">
-    <div class="background"></div>
-    <div class="character" id="character"></div>
+  <button id="startButton">Запустить игру</button>
+  <div id="gameContainer" class="hidden">
+    <div id="character"></div>
+    <div class="ball"></div>
+    <div class="ball"></div>
   </div>
-  <script src="script.js"></script>
+  <!-- Добавьте в ваш HTML код для джойстика -->
+<div class="joystick">
+  <div class="stick"></div>
+</div>
 
-<!-- HTML код окна с текстом "Игра окончена" и кнопкой "Назад" -->
-  <div id="gameOverModal" class="modal">
+  <!-- Карта -->
+  <div id="miniMap" class="mini-map"></div>
+  <!-- счетчик -->
+  <div id="scoreCounter" class="score-counter">Счет: <span id="score" style="color: rgb(119, 195, 89);">0$</span></div>
+  <!-- Магазин -->
+  <button id="shopButton" class="shop-button">Магазин</button>
+  <div id="shopModal" class="modal">
     <div class="modal-content">
-      <h2>Game over!</h2>
-      <button id="backButton">Back to main menu</button>
+      <span id="closeModal" class="close-button">Закрыть</span>
+      <h1>Магазин</h1>
+      <h3>Собрано кружков: <span id="collectedBallsCount" style="color: rgb(119, 195, 89);">0$</span></h3>
+      <h3>Уровень скорости: <span id="speedLevel">1</span></h3>
+      <button id="upgradeSpeedButton">Улучшить скорость (10 кружков)</button>
     </div>
   </div>
-
-  <!-- HTML код второго модального окна с кнопкой "Играть" -->
-  <div id="mainMenuModal" class="modal fullscreen">
-    <div class="modal-content">
-      <h2>Main Menu</h2>
-      <button id="playButton">Play</button>
-    </div>
-  </div>
-</body>
-</html>
   
+  <!-- Добавьте кнопку паузы -->
+  <button id="pauseButton" class="pause-button">Пауза</button>
+
+
+  <!-- Окно паузы -->
+  <div id="pauseModal" class="pause-modal">
+    <div class="pause-modal-content">
+      <h2>Пауза</h2>
+      <div class="pause-modal-buttons">
+        <button id="continueButton" class="pause-modal-button">Продолжить игру</button>
+        <button id="settingsButton" class="pause-modal-button">Настройки</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="script.js"></script>
 </body>
 </html>
