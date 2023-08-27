@@ -14,9 +14,9 @@
     <div class="ball"></div>
   </div>
   <!-- Добавьте в ваш HTML код для джойстика -->
-<div class="joystick">
-  <div class="stick"></div>
-</div>
+  <div class="joystick">
+    <div class="stick"></div>
+  </div>
 
   <!-- Карта -->
   <div id="miniMap" class="mini-map"></div>
@@ -48,6 +48,21 @@
       </div>
     </div>
   </div>
+
+  <div id="settingsModal" class="modal">
+    <!-- ... (existing content) ... -->
+    <div id="controlSettings">
+      <h2>Control Settings</h2>
+      <label>
+        <input type="radio" name="controlType" value="joystick"> Joystick
+      </label>
+      <label>
+        <input type="radio" name="controlType" value="keyboard"> Keyboard
+      </label>
+    </div>
+  </div>
+  
+  
   
   <script src="script.js"></script>
 </body>
